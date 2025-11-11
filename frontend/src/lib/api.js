@@ -1,7 +1,9 @@
-const BACKEND = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const RAW_BACKEND = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const BACKEND = RAW_BACKEND.endsWith("/") ? RAW_BACKEND.slice(0, -1) : RAW_BACKEND;
 
 async function apiRequest(endpoint, options = {}) {
-  const url = `${BACKEND}${endpoint}`;
+  const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const url = `${BACKEND}${path}`;
   try {
     const res = await fetch(url, options);
     if (!res.ok) {

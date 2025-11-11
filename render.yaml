@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: release-tracker-backend
+    env: python
+    rootDirectory: backend
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /health
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: gunicorn -w 2 -k gthread -b 0.0.0.0:$PORT wsgi:app
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXP_SECONDS
+        value: "86400"
+      - key: USERS_TABLE
+        value: user_details
+      - key: RELEASES_TABLE
+        value: releases
+      - key: USER_PASSWORD_COL
+        value: password_hash

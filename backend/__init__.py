@@ -8,7 +8,22 @@ from .routes.scanner import bp_scanner
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
+    
+    # Configure CORS
+    CORS(app, 
+         resources={
+             r"/*": {
+                 "origins": [
+                     "https://stracker-eta.vercel.app",
+                     "http://localhost:5173"  # For local development
+                 ],
+                 "methods": ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+                 "allow_headers": ["Content-Type", "Authorization"]
+             }
+         },
+         supports_credentials=True
+    )
+    
     logging.basicConfig(level=logging.INFO)
 
     # Health and root

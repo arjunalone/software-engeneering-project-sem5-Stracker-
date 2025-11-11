@@ -44,7 +44,7 @@ HEADERS = {
 }
 
 app = Flask(__name__)
-CORS(app)
+# CORS is now configured in __init__.py
 logging.basicConfig(level=logging.INFO)
 
 
