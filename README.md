@@ -2,7 +2,7 @@
 
 A modern full‑stack web application to **track software releases**, **scan requirement files**, and **manage user accounts with role‑based access**.
 
-Built with **Flask + Supabase (Backend)** and **React + Vite + Tailwind (Frontend)**, featuring secure **JWT authentication** and a strict **single‑admin policy**.
+Built with **Flask + Supabase (Backend)** and **React + Vite + Tailwind (Frontend)**, featuring secure **JWT authentication** and a strict **single‑admin policy**.kbk
 
 ---
 
