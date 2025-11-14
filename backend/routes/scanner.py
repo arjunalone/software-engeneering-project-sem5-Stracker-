@@ -37,8 +37,18 @@ def scan():
     else:
         return jsonify({"error": "Only requirements.txt or pyproject.toml are supported"}), 400
 
-    results = []
+    # Deduplicate by case-insensitive package name; keep first occurrence/spec
+    unique = {}
     for it in items:
+        name = (it.get("name") or "").strip()
+        if not name:
+            continue
+        key = name.lower()
+        if key not in unique:
+            unique[key] = {"name": name, "spec": it.get("spec", "")}
+
+    results = []
+    for it in unique.values():
         name = it.get("name")
         if not name:
             continue

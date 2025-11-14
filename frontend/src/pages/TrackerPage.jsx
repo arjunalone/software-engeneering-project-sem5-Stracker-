@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import { getReleases } from "../lib/api";
 import NewReleaseForm from "../components/NewReleaseForm";
@@ -9,6 +9,7 @@ export default function TrackerPage({ user, token }) {
   const [releases, setReleases] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const fetchedRef = useRef(false);
 
   const fetchReleases = useCallback(async () => {
     setIsLoading(true);
@@ -24,7 +25,11 @@ export default function TrackerPage({ user, token }) {
     }
   }, [token]);
 
-  useEffect(() => { fetchReleases(); }, [fetchReleases]);
+  useEffect(() => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+    fetchReleases();
+  }, [fetchReleases]);
 
   const handleReleaseCreated = (newRelease) => setReleases([newRelease, ...releases]);
   const handleReleaseDeleted = (releaseId) => setReleases(releases.filter(r => r.id !== releaseId));

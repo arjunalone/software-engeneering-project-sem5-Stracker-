@@ -32,19 +32,8 @@ def register():
         return jsonify({"error": "email already registered"}), 400
 
     if requested_role == "admin":
-        if not ADMIN_SIGNUP_SECRET or admin_secret != ADMIN_SIGNUP_SECRET:
-            return jsonify({"error": "invalid admin secret"}), 403
-        # enforce single-admin policy
-        check_admin_q = f"{REST_BASE}/{USERS_TABLE}?role=eq.admin&select=id&limit=1"
-        r_admin = requests.get(check_admin_q, headers=HEADERS, timeout=8)
-        if r_admin.status_code != 200:
-            logging.error("Supabase admin check failed: %s %s", r_admin.status_code, r_admin.text)
-            return jsonify({"error": "failed to check admin"}), 502
-        if r_admin.json():
-            return jsonify({"error": "admin already exists"}), 403
-        role_value = "admin"
-    else:
-        role_value = "user"
+        return jsonify({"error": "admin signup is disabled"}), 403
+    role_value = "user"
 
     pw_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
     payload = {"name": name, "email": email, USER_PASSWORD_COL: pw_hash, "role": role_value}
@@ -131,6 +120,20 @@ def admin_list_users():
         logging.error("Supabase list users failed: %s %s", r.status_code, r.text)
         return jsonify({"error": "failed to fetch users"}), 502
     return jsonify({"users": r.json()}), 200
+
+
+@bp_auth.route("/admin/users/<user_id>", methods=["DELETE"])
+def admin_delete_user(user_id: str):
+    _, _, error_response = require_roles(["admin"])
+    if error_response:
+        return error_response
+
+    url = f"{REST_BASE}/{USERS_TABLE}?id=eq.{requests.utils.requote_uri(user_id)}"
+    r = requests.delete(url, headers=HEADERS, timeout=8)
+    if r.status_code not in (200, 204):
+        logging.error("Supabase delete user failed: %s %s", r.status_code, r.text)
+        return jsonify({"error": "failed to delete user"}), 502
+    return jsonify({"deleted": True, "id": user_id}), 200
 
 
 @bp_auth.route("/admin/users/<user_id>/role", methods=["PATCH"])

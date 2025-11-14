@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Loader2, Upload, Plus } from "lucide-react";
 import { scanFile, importScanResults } from "../lib/api";
 
@@ -31,6 +31,21 @@ export default function DependencyScanner({ token, onImported }) {
       if (resp?.error) setError(resp.error); else { onImported?.(); alert(`Imported ${resp.length} releases`); }
     } catch (e) { setError(e.message); }
     finally { setIsLoading(false); }
+  };
+
+  const selectedCount = Object.values(selected).filter(Boolean).length;
+  const allSelected = results.length > 0 && selectedCount === results.length;
+  const someSelected = selectedCount > 0 && !allSelected;
+  const headerCheckboxRef = useRef(null);
+  useEffect(() => { if (headerCheckboxRef.current) headerCheckboxRef.current.indeterminate = someSelected; }, [someSelected]);
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      const all = {};
+      results.forEach(r => { all[r.name] = true; });
+      setSelected(all);
+    } else {
+      setSelected({});
+    }
   };
 
   return (
@@ -71,7 +86,9 @@ export default function DependencyScanner({ token, onImported }) {
             <table className="min-w-full divide-y divide-gray-300">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="w-10"></th>
+                  <th className="w-10">
+                    <input ref={headerCheckboxRef} type="checkbox" checked={allSelected} onChange={e => handleSelectAll(e.target.checked)} />
+                  </th>
                   <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Package</th>
                   <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Your Spec</th>
                   <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Latest Release</th>

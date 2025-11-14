@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Loader2, Shield } from "lucide-react";
 import { adminListUsers } from "../lib/api";
 
@@ -6,6 +6,7 @@ export default function AdminPage({ token }) {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const fetchedRef = useRef(false);
 
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
@@ -16,7 +17,11 @@ export default function AdminPage({ token }) {
     setIsLoading(false);
   }, [token]);
 
-  useEffect(() => { fetchUsers(); }, [fetchUsers]);
+  useEffect(() => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleRoleChange = async () => {};
 

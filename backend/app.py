@@ -21,6 +21,7 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 JWT_SECRET = os.environ.get("JWT_SECRET")
 JWT_EXP_SECONDS = int(os.environ.get("JWT_EXP_SECONDS", "86400"))
+FRONTEND_ORIGIN = os.environ.get("FRONTEND_ORIGIN", "*")
 
 if not SUPABASE_URL:
     raise RuntimeError("Missing SUPABASE_URL in backend/.env")
@@ -44,7 +45,18 @@ HEADERS = {
 }
 
 app = Flask(__name__)
-# CORS is now configured in __init__.py
+# Basic CORS for local dev and deployment
+CORS(
+    app,
+    resources={
+        r"/*": {
+            "origins": [FRONTEND_ORIGIN, "http://localhost:5173", "http://127.0.0.1:5173"],
+            "methods": ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+        }
+    },
+    supports_credentials=True,
+)
 logging.basicConfig(level=logging.INFO)
 
 
