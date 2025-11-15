@@ -20,6 +20,7 @@ def create_app():
             r"/*": {
                 "origins": [
                     "https://stracker-eta.vercel.app",
+                    "https://software-engeneering-project-sem5.vercel.app",
                     re.compile(r"http://localhost:\\d+"),
                     re.compile(r"http://127\.0\.0\.1:\\d+"),
                 ],
@@ -38,6 +39,7 @@ def create_app():
         # Allow Vercel deployment and local dev hosts
         if origin and (
             origin == "https://stracker-eta.vercel.app"
+            or origin == "https://software-engeneering-project-sem5.vercel.app"
             or origin.startswith("http://localhost:")
             or origin.startswith("http://127.0.0.1:")
         ):
